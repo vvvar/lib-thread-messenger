@@ -5,24 +5,22 @@
 namespace messageq
 {
 
-using Message = message::Message;
-
 class MessageQ
 {
 public:
-  using MessageQPtr = std::shared_ptr<MessageQ>;
-  using MessagePtr  = Message::MessagePtr;
+  template<typename T>
+  using SharedPtr   = std::shared_ptr<T>;
+  using MessageName = const char*;
   
-  static MessageQPtr MakeMessageQ()
+  template<typename T>
+  void push(MessageName message_name, SharedPtr<T> message_data_ptr)
   {
-    return std::make_shared<MessageQ>();
-  }
-  void push(MessagePtr message_ptr)
-  {
+    auto message_ptr = std::make_shared<message::Message>(message_name, message_data_ptr);
     std::lock_guard<std::mutex> lock(_message_q_mutex);
     _message_q.push(message_ptr);
   }
-  MessagePtr pop()
+  template<typename T>
+  SharedPtr<T> pop()
   {
     std::lock_guard<std::mutex> lock(_message_q_mutex);
     if (_message_q.empty()) {
@@ -30,11 +28,11 @@ public:
     }
     auto message_ptr = _message_q.front();
     _message_q.pop();
-    return message_ptr;
+    return std::static_pointer_cast<T>(message_ptr->getData());
   }
 private:
-  std::queue<MessagePtr> _message_q;
-  std::mutex             _message_q_mutex;
+  std::queue<SharedPtr<message::Message>> _message_q;
+  std::mutex                              _message_q_mutex;
 };
 
 }

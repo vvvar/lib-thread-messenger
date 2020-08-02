@@ -1,39 +1,38 @@
 #pragma once
 #include <map>
-#include "./Message.hpp"
 #include "./MessageQ.hpp"
 
 namespace transport
 {
 
-using Message = message::Message;
-using MessageQ = messageq::MessageQ;
-
 class Transport
 {
 public:
-  using MessageQName = std::string;
-  using MessageQPtr  = MessageQ::MessageQPtr;
-  using MessageQMap  = std::map<MessageQName, MessageQPtr>;
-  using MessageName  = Message::MessageName;
-  using MessagePtr   = Message::MessagePtr;
+  template<typename T>
+  using SharedPtr   = std::shared_ptr<T>;
+  using MessageName = const char*;
   
-  void send(MessagePtr message_ptr)
+  template<typename T>
+  void send(MessageName message_name, SharedPtr<T> message_data_ptr)
   {
-    auto message_name = message_ptr->getName();
     if (!isMessageQExists(message_name)) {
       createMessageQ(message_name);
     }
-    getMessageQ(message_name)->push(message_ptr);
+    getMessageQ(message_name)->push(message_name, message_data_ptr);
   }
-  MessagePtr receive(MessageName message_name)
+  template<typename T>
+  SharedPtr<T> receive(MessageName message_name)
   {
     if (!isMessageQExists(message_name)) {
       throw std::runtime_error("no messages with such name");
     }
-    return getMessageQ(message_name)->pop();
+    return getMessageQ(message_name)->pop<T>();
   }
 private:
+  using MessageQName = std::string;
+  using MessageQPtr  = SharedPtr<messageq::MessageQ>;
+  using MessageQMap  = std::map<MessageQName, MessageQPtr>;
+  
   MessageQMap _message_q_map;
   std::mutex  _message_q_map_mutex;
   
@@ -54,7 +53,7 @@ private:
   {
     if (!isMessageQExists(message_name)) {
       std::lock_guard<std::mutex> lock(_message_q_map_mutex);
-      _message_q_map[message_name] = MessageQ::MakeMessageQ();
+      _message_q_map[message_name] = std::make_shared<messageq::MessageQ>();
     }
   }
 };
