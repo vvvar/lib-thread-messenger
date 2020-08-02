@@ -1,7 +1,16 @@
 #pragma once
 #include "./Messenger.hpp"
 
-std::shared_ptr<messenger::Messenger> MakeMessenger()
+namespace libthreadmessenger
+{
+
+using MessengerPtr = std::shared_ptr<messenger::Messenger>;
+
+MessengerPtr MakeMessenger()
 {
    return std::make_shared<messenger::Messenger>();
 }
+
+}
+
+

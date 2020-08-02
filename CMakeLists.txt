@@ -4,8 +4,13 @@ cmake_minimum_required(VERSION 3.17)
 
 add_library(${PROJECT_NAME} STATIC
   src/Messenger.cpp
-  include/${PROJECT_NAME}/ThreadMessenger.hpp
+  include/${PROJECT_NAME}/Channel.hpp
+  include/${PROJECT_NAME}/Logging.hpp
+  include/${PROJECT_NAME}/Message.hpp
+  include/${PROJECT_NAME}/MessageQ.hpp
   include/${PROJECT_NAME}/Messenger.hpp
+  include/${PROJECT_NAME}/ThreadMessenger.hpp
+  include/${PROJECT_NAME}/Transport.hpp
 )
 
 target_include_directories(${PROJECT_NAME}
