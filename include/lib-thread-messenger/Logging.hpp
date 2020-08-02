@@ -10,6 +10,7 @@ namespace logging
 class Logger
 {
 private:
+  bool        _is_silent;
   bool        _display_thread_id;
   std::string _prefix;
   
@@ -51,19 +52,24 @@ private:
   }
   
 public:
-  Logger(std::string prefix, bool display_thread_id):
+  Logger(std::string prefix, bool display_thread_id, bool is_silent):
     _prefix(prefix),
-    _display_thread_id(display_thread_id)
+    _display_thread_id(display_thread_id),
+    _is_silent(is_silent)
   {}
   template<typename ... Args>
   void log(const std::string& format, Args ...args) const
   {
-    std::cout << to_log_line("log", format, args...);
+    if (!_is_silent) {
+      std::cout << to_log_line("log", format, args...);
+    }
   }
   template<typename ... Args>
   void error(const std::string& format, Args ...args) const
   {
-    std::cerr << to_log_line("err", format, args...);
+    if (!_is_silent) {
+      std::cerr << to_log_line("err", format, args...);
+    }
   }
 };
 
@@ -76,7 +82,7 @@ public:
   using LoggerPrefix = const std::string;
   static Logger createLogger(LoggerPrefix prefix = "default")
   {
-    return Logger(prefix, _debug_thread_info);
+    return Logger(prefix, _debug_thread_info, true);
   }
 };
 
