@@ -1,0 +1,5 @@
+.DS_Store
+include/.DS_Store
+include/lib-thread-messenger/.DS_Store
+
+/build
