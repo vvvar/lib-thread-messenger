@@ -44,7 +44,7 @@ void Messenger::waitForMessageInChannel(ChannelName channel_name)
 
 void Messenger::ThrowError(ErrorText error_text)
 {
-  throw std::runtime_error("attempt to receive message from empty channel");
+  throw std::runtime_error(error_text);
 }
 
 bool Messenger::isChannelExists(ChannelName channel_name)

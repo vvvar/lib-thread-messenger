@@ -3,7 +3,9 @@ project(lib-thread-messenger)
 cmake_minimum_required(VERSION 3.17)
 
 add_library(${PROJECT_NAME} STATIC
+  src/Channel.cpp
   src/Messenger.cpp
+  src/Transport.cpp
   include/${PROJECT_NAME}/Channel.hpp
   include/${PROJECT_NAME}/Logging.hpp
   include/${PROJECT_NAME}/Message.hpp

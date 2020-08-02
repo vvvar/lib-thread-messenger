@@ -1,5 +1,7 @@
 #pragma once
 #include <queue>
+#include <memory>
+#include <mutex>
 #include "./Message.hpp"
 
 namespace messageq
