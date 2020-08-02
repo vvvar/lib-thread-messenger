@@ -13,20 +13,22 @@ public:
   using MessageName = const char*;
   
   template<typename T>
-  void send(MessageName message_name, SharedPtr<T> message_data_ptr)
+  void send(SharedPtr<T> data_ptr)
   {
-    if (!isMessageQExists(message_name)) {
-      createMessageQ(message_name);
+    auto q_name = typeid(T).name();
+    if (!isMessageQExists(q_name)) {
+      createMessageQ(q_name);
     }
-    getMessageQ(message_name)->push(message_name, message_data_ptr);
+    getMessageQ(q_name)->push(q_name, data_ptr);
   }
   template<typename T>
-  SharedPtr<T> receive(MessageName message_name)
+  SharedPtr<T> receive()
   {
-    if (!isMessageQExists(message_name)) {
+    auto q_name = typeid(T).name();
+    if (!isMessageQExists(q_name)) {
       throw std::runtime_error("no messages with such name");
     }
-    return getMessageQ(message_name)->pop<T>();
+    return getMessageQ(q_name)->pop<T>();
   }
 private:
   using MessageQName = std::string;
@@ -36,24 +38,24 @@ private:
   MessageQMap _message_q_map;
   std::mutex  _message_q_map_mutex;
   
-  bool isMessageQExists(MessageQName message_q_name)
+  bool isMessageQExists(MessageQName q_name)
   {
     std::lock_guard<std::mutex> lock(_message_q_map_mutex);
-    MessageQMap::const_iterator it = _message_q_map.find(message_q_name);
+    MessageQMap::const_iterator it = _message_q_map.find(q_name);
     return (it != _message_q_map.end());
   }
-  MessageQPtr getMessageQ(MessageQName message_q_name)
+  MessageQPtr getMessageQ(MessageQName q_name)
   {
-    createMessageQ(message_q_name);
+    createMessageQ(q_name);
     std::lock_guard<std::mutex> lock(_message_q_map_mutex);
-    auto message_q = _message_q_map.find(message_q_name);
+    auto message_q = _message_q_map.find(q_name);
     return message_q->second;
   }
-  void createMessageQ(MessageQName message_name)
+  void createMessageQ(MessageQName q_name)
   {
-    if (!isMessageQExists(message_name)) {
+    if (!isMessageQExists(q_name)) {
       std::lock_guard<std::mutex> lock(_message_q_map_mutex);
-      _message_q_map[message_name] = std::make_shared<messageq::MessageQ>();
+      _message_q_map[q_name] = std::make_shared<messageq::MessageQ>();
     }
   }
 };

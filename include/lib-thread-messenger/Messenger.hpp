@@ -11,29 +11,28 @@ public:
   template<typename T>
   using SharedPtr = std::shared_ptr<T>;
   using ChannelName = std::string;
-  using MessageName = const char*;
   
   Messenger():
     _logger(logging::LoggerFactory::createLogger("Messenger"))
   {}
   template<typename T>
-  void send(ChannelName channel_name, MessageName message_name, SharedPtr<T> message_data_ptr)
+  void send(ChannelName channel_name, SharedPtr<T> data_ptr)
   {
-    _logger.log("Publishing message %s to the channel %s...", message_name, channel_name);
+    _logger.log("Publishing data to the channel %s...", channel_name);
     if (isChannelExists(channel_name)) {
       std::lock_guard<std::mutex> lock(_channels_mutex);
-      _channels_map.at(channel_name)->publish(message_name, message_data_ptr);
+      _channels_map.at(channel_name)->publish(data_ptr);
     } else {
       _logger.error("No such channel %s!", channel_name);
     }
   }
   template<typename T>
-  SharedPtr<T> receive(ChannelName channel_name, MessageName message_name)
+  SharedPtr<T> receive(ChannelName channel_name)
   {
-    _logger.log("Unpublishing %s message from the channel %s...", message_name, channel_name);
+    _logger.log("Unpublishing data from the channel %s...", channel_name);
     if (isChannelExists(channel_name)) {
       std::lock_guard<std::mutex> lock(_channels_mutex);
-      return _channels_map.at(channel_name)->unpublish<T>(message_name);
+      return _channels_map.at(channel_name)->unpublish<T>();
     } else {
       _logger.error("No such channel %s!", channel_name);
       throw std::runtime_error("attempt to receive message from empty channel");
@@ -64,9 +63,9 @@ public:
   void waitForMessageInChannel(ChannelName channel_name)
   {
     if (isChannelExists(channel_name)) {
-      _logger.log("Waiting for new messages from channel %s...", channel_name);
+      _logger.log("Waiting for new data from channel %s...", channel_name);
       getChannel(channel_name)->waitUnitlMessage();
-      _logger.log("Received new messages in channel %s!", channel_name);
+      _logger.log("Received data in the channel %s!", channel_name);
     } else {
       _logger.error("Attempt to wait for channel %s that does not exists!", channel_name);
     }

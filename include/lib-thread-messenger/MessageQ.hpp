@@ -22,6 +22,7 @@ public:
   template<typename T>
   SharedPtr<T> pop()
   {
+    static_assert(std::is_base_of<message::MessageData, T>::value, "T must be a child of MessageData");
     std::lock_guard<std::mutex> lock(_message_q_mutex);
     if (_message_q.empty()) {
       throw std::runtime_error("messages stack underflow");
