@@ -18,12 +18,12 @@ This library provides you with `Messenger` class that is capable of sending and 
 ## Installation
 
 Download and add to your CMake project:
-```sh
+```SH
 add_subdirectory(lib-thread-messenger)
 ```
 
 Another option for the CMake might be downloading it directly from the GitHub:
-```
+```SH
 include(FetchContent)
 FetchContent_Declare(
   lib-thread-messenger
