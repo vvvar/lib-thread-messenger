@@ -9,11 +9,11 @@
 
 ## Motivation
 
-During the development of my home pet-project, I was challenged to establish simple communication between threads. The communication consisted in sending of pointers to the objects between any number of threads. After researching, I wasn't able to find any simple enough solution for my task that can be easily integrated using CMake into my project, so I've docided to create my own one, especially since it's very simple.
+During the development of my home pet-project, I was challenged to establish simple communication between threads. The communication consisted of sending pointers to the objects between any number of threads. After researching, I wasn't able to find any simple enough solution for my task that can be integrated using CMake into my project, so I've decided to create my one, especially since it's rather simple.
 
 ## Overview
 
-This library provides you with `Messenger` class that is capable of sending and receiving pointers to any kind of objects. Primary use case is data from one thread to another using single source of truth.
+This library provides you with a `Messenger` class that is capable of sending and receiving pointers to any sort of object. The primary use case is data from one thread to another using a single source of truth.
 
 ## Installation
 
@@ -40,14 +40,14 @@ target_link_libraries(${PROJECT_NAME}
 
 ## Usage example
 
-Let's imagine that we're challenged with a task to create simple application that shall ask user for name from console-based UI and print it. Sound's childish, isn't it? But let's now imagine that user data should be handled in one thread and processed in another. Now we should somehow pass data between UI thread and worker thread.
+Let's imagine that we're challenged with a task to create a simple application that shall ask the user for a name from console-based UI and print it. Sound's childish, isn't it? But let's now imagine that user data should be handled in one thread and processed in another. Now we should somehow pass data between UI thread and the Worker Thread.
 
 First, include main header file:
 ```CPP
 #include <lib-thread-messenger/ThreadMessenger.hpp>
 ```
 
-Let's definine the data. All classes that we would like to transfer between threads should inherit from `MessageData` that can be found in the `message` namespace. Here is how it will lok like:
+Let's define the data. All classes that we would like to transfer between threads should inherit from `MessageData` that can be found in the `message` namespace. Here is how it will look like:
 ```CPP
 class UserData: public MessageData
 {
@@ -72,12 +72,12 @@ auto messenger_ptr = libthreadmessenger::MakeMessenger();
 ```
 This will build instance of `Messenger` class wrapped in shared pointer.
 
-In order to not notify each thread after every data transfer, we can use channels. Basic idea is to use one channel per thread, but you're free to use any amount of channels in any thread. To register channel, use `registerChannel(ChannelName)` method:
+To not notify each thread after every data transfer, we can use channels. The idea is to use one channel per thread, but you're free to use any amount of channels in any thread. To register channel, use `registerChannel(ChannelName)` method:
 ```CPP
 messenger_ptr->registerChannel("worker");
 ```
 
-Then, let's create two threads, first is Worker Thread that will be responsible for processing(simple print in our case) of data and UI Thread that will prompt data in console and will send it to the Worker Thread.
+Then, let's create two threads, first is Worker Thread that will be responsible for processing(simple print in our case) of data and UI Thread that will prompt data in the console and will send it to the Worker Thread.
 ```CPP
 void Worker_Thread(std::shared_ptr<Messenger> messenger_ptr)
 {
@@ -98,7 +98,7 @@ void UI_Thread(std::shared_ptr<Messenger> messenger_ptr)
 }
 ```
 
-In the Worker Thread, we would like to wait until data will come, as far as we're using _worker_ channel, let's wait until data will come there:
+In the Worker Thread, we would like to wait until data will come, as far as we're using _worker_ channel, let's wait until data comes there:
 ```CPP
 // freeze thread until new data in channel
 messenger_ptr->waitForMessageInChannel("worker");
